@@ -8,6 +8,17 @@ locals {
   # Detect Graviton (ARM64) instance families so we can select the right AMI.
   is_arm = can(regex("^(t4g|c6g|c7g|m6g|m7g|r6g|r7g)", var.instance_type))
   arch   = local.is_arm ? "arm64" : "x86_64"
+
+  # When Docker mode is enabled and the user left the default t4g.micro,
+  # automatically upgrade to t4g.small (2 GiB RAM) because running two
+  # containers (postgres + server) alongside the Docker daemon exhausts 1 GiB.
+  effective_instance_type = (var.use_docker && var.instance_type == "t4g.micro") ? "t4g.small" : var.instance_type
+
+  # Docker images and layers require more disk space than a plain source checkout.
+  volume_size = var.use_docker ? 30 : 20
+
+  # Select the appropriate bootstrap script.
+  user_data = var.use_docker ? file("${path.module}/scripts/user-data-docker.sh") : file("${path.module}/scripts/user-data.sh")
 }
 
 # ── AMI ────────────────────────────────────────────────────────────────────
@@ -122,19 +133,18 @@ resource "aws_iam_instance_profile" "paperclip" {
 # ── EC2 Instance ───────────────────────────────────────────────────────────
 resource "aws_instance" "paperclip" {
   ami                    = data.aws_ssm_parameter.al2023_ami.value
-  instance_type          = var.instance_type
+  instance_type          = local.effective_instance_type
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.paperclip.id]
   iam_instance_profile   = aws_iam_instance_profile.paperclip.name
   key_name               = var.key_name
-  user_data              = file("${path.module}/scripts/user-data.sh")
+  user_data              = local.user_data
 
-  # gp3 is cheaper and faster than gp2; 20 GB gives ample space for
-  # Node.js, pnpm, the Paperclip monorepo, and the embedded PostgreSQL
-  # database (~$1.60/month in us-east-1).
+  # gp3 is cheaper and faster than gp2.
+  # 20 GB for the native build; 30 GB when Docker is enabled (image layers).
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 20
+    volume_size           = local.volume_size
     delete_on_termination = true
   }
 

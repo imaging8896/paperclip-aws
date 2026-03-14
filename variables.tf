@@ -15,3 +15,20 @@ variable "key_name" {
   type        = string
   default     = null
 }
+
+variable "use_docker" {
+  description = <<-EOT
+    When true, run Paperclip via Docker Compose (production server + PostgreSQL container)
+    using the official Dockerfile from the Paperclip repository.
+
+    Cost comparison:
+      false (default) – native build: t4g.micro + 20 GB gp3 ≈ $7.65 / month
+      true  – Docker Compose:  t4g.small + 30 GB gp3 ≈ $14.54 / month
+
+    The Docker path requires a t4g.small (2 GiB RAM) to comfortably run both the
+    PostgreSQL container and the Node.js server container side-by-side.
+    It also enables production mode with authentication (BETTER_AUTH_SECRET).
+  EOT
+  type        = bool
+  default     = false
+}

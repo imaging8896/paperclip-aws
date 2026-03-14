@@ -39,7 +39,6 @@ npm --version
 
 # ── pnpm (version pinned to match Paperclip's packageManager field) ────────
 # Paperclip requires pnpm@9.15.4
-export PNPM_HOME="${PNPM_HOME}"
 export PATH="${PNPM_HOME}:${PATH}"
 
 sudo -u "${APP_USER}" env HOME="${APP_HOME}" \
@@ -77,7 +76,7 @@ sudo -u "${APP_USER}" env \
   HOME="${APP_HOME}" \
   PATH="${APP_HOME}/.local/share/pnpm:${PATH}" \
   PAPERCLIP_MIGRATION_PROMPT=never \
-  pnpm db:migrate || echo "db:migrate returned non-zero (may be first run — continuing)"
+  pnpm db:migrate || echo "db:migrate exited with non-zero status — check logs if unexpected"
 
 # ── systemd service ──────────────────────────────────────────────────────
 # Use `pnpm dev:once` which starts API + UI without file-watching.
