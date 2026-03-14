@@ -1,6 +1,6 @@
 output "paperclip_url" {
-  description = "Paperclip web UI URL (available ~3-5 min after first boot)"
-  value       = "http://${aws_eip.paperclip.public_ip}:3100"
+  description = "Paperclip web UI URL — open this in your browser after starting the SSH tunnel"
+  value       = "http://localhost:3100"
 }
 
 output "public_ip" {
@@ -8,7 +8,12 @@ output "public_ip" {
   value       = aws_eip.paperclip.public_ip
 }
 
+output "ssh_tunnel_command" {
+  description = "SSH command to forward Paperclip UI to localhost:3100 (requires key_name to be set)"
+  value       = "ssh -N -L 3100:localhost:3100 ec2-user@${aws_eip.paperclip.public_ip}"
+}
+
 output "ssh_command" {
-  description = "SSH command (only applicable if key_name variable is set)"
-  value       = "ssh -i ~/.ssh/<your-key>.pem ec2-user@${aws_eip.paperclip.public_ip}"
+  description = "SSH command to open an interactive shell (requires key_name to be set)"
+  value       = "ssh ec2-user@${aws_eip.paperclip.public_ip}"
 }

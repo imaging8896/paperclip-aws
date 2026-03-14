@@ -1,13 +1,3 @@
-variable "allowed_ip" {
-  description = "Your personal IP in CIDR notation. Only this address can reach SSH (22) and the Paperclip UI (3100). Example: \"203.0.113.5/32\""
-  type        = string
-
-  validation {
-    condition     = can(cidrhost(var.allowed_ip, 0))
-    error_message = "allowed_ip must be a valid CIDR block, e.g. \"1.2.3.4/32\"."
-  }
-}
-
 variable "aws_region" {
   description = "AWS region to deploy into."
   type        = string

@@ -62,26 +62,21 @@ resource "aws_route_table_association" "public" {
 }
 
 # ── Security Group ─────────────────────────────────────────────────────────
-# Only the personal IP can reach SSH and the Paperclip web UI.
+# SSH is open from anywhere so the user can connect from a dynamic IP and
+# forward port 3100 to their local machine via an SSH tunnel.
+# Port 3100 is intentionally NOT exposed publicly — the Paperclip UI is
+# accessed exclusively through the tunnel (http://localhost:3100).
 resource "aws_security_group" "paperclip" {
   name        = local.name
-  description = "Allow SSH and Paperclip UI from personal IP only"
+  description = "Allow SSH from anywhere; Paperclip UI via SSH tunnel only"
   vpc_id      = aws_vpc.paperclip.id
 
   ingress {
-    description = "SSH from personal IP"
+    description = "SSH from anywhere - use SSH tunnel for UI access"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_ip]
-  }
-
-  ingress {
-    description = "Paperclip web UI from personal IP"
-    from_port   = 3100
-    to_port     = 3100
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ip]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -97,7 +92,8 @@ resource "aws_security_group" "paperclip" {
 
 # ── IAM Role ───────────────────────────────────────────────────────────────
 # SSM Session Manager lets you open a terminal from the AWS console
-# without opening port 22.  The SSH ingress rule above is kept for convenience.
+# without a key pair.  It can also be used for port-forwarding instead of
+# a traditional SSH tunnel if preferred.
 resource "aws_iam_role" "paperclip" {
   name = local.name
 

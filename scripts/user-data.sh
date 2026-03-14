@@ -4,7 +4,7 @@
 # Runs once on first boot via EC2 User Data.
 #
 # After ~3-5 minutes the Paperclip UI will be available at:
-#   http://<elastic-ip>:3100
+#   http://localhost:3100  (forward the port with: ssh -N -L 3100:localhost:3100 ec2-user@<elastic-ip>)
 # =============================================================================
 set -euo pipefail
 
