@@ -1,17 +1,23 @@
-# CDK output
-cdk.out/
+# Terraform state — never commit
+*.tfstate
+*.tfstate.backup
 
-# Node.js
-node_modules/
-*.js.map
+# Terraform working directory
+.terraform/
 
-# TypeScript compiled output (CDK projects keep .ts sources, ignore .js/.d.ts)
-*.d.ts
-*.js
-!jest.config.js
+# Variable files may contain sensitive values
+*.tfvars
+*.tfvars.json
 
-# CDK context (keep this committed for reproducible deploys)
-!cdk.context.json
+# Crash log
+crash.log
+crash.*.log
+
+# Override files (local developer overrides)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
 # Editor
 .idea/
@@ -24,4 +30,3 @@ node_modules/
 
 # Logs
 *.log
-npm-debug.log*
