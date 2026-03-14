@@ -1,0 +1,27 @@
+# CDK output
+cdk.out/
+
+# Node.js
+node_modules/
+*.js.map
+
+# TypeScript compiled output (CDK projects keep .ts sources, ignore .js/.d.ts)
+*.d.ts
+*.js
+!jest.config.js
+
+# CDK context (keep this committed for reproducible deploys)
+!cdk.context.json
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

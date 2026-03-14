@@ -1,0 +1,25 @@
+{
+  "name": "paperclip-aws",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure to self-host Paperclip at minimum cost for a single user",
+  "main": "bin/paperclip-aws.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "destroy": "cdk destroy"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "aws-cdk": "2.1111.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.243.0",
+    "constructs": "^10.5.1"
+  }
+}
