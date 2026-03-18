@@ -127,7 +127,9 @@ resource "aws_instance" "paperclip" {
   vpc_security_group_ids = [aws_security_group.paperclip.id]
   iam_instance_profile   = aws_iam_instance_profile.paperclip.name
   key_name               = var.key_name
-  user_data              = file("${path.module}/scripts/user-data.sh")
+  user_data = templatefile("${path.module}/scripts/user-data.sh", {
+    anthropic_api_key = var.anthropic_api_key
+  })
 
   # gp3 is cheaper and faster than gp2; 20 GB gives ample space for
   # Node.js, pnpm, the Paperclip monorepo, and the embedded PostgreSQL
