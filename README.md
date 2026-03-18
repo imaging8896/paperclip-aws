@@ -4,13 +4,13 @@ Terraform infrastructure to self-host [Paperclip](https://github.com/paperclipai
 
 ## Architecture
 
-| Resource | Detail | Est. cost (us-east-1) |
+| Resource | Detail | Est. cost (ap-northeast-1) |
 |---|---|---|
-| EC2 `t4g.micro` | ARM64, 2 vCPU, 1 GiB RAM | ~$6.05 / month |
-| EBS `gp3` 20 GB | Root volume | ~$1.60 / month |
+| EC2 `t4g.small` | ARM64, 2 vCPU, 2 GiB RAM | ~$15.40 / month |
+| EBS `gp3` 20 GB | Root volume | ~$1.92 / month |
 | Elastic IP | Stable public IP (free while attached) | $0.00 / month |
 | VPC (single public subnet) | No NAT gateway | $0.00 / month |
-| **Total** | | **~$7.65 / month** |
+| **Total** | | **~$17.32 / month** |
 
 > **AWS Free Tier:** If your account is within its first 12 months, set `instance_type = "t3.micro"` (x86) to use the 750 hrs/month free allowance.
 
@@ -42,6 +42,7 @@ aws ssm start-session \
 - [Terraform 1.5+](https://developer.hashicorp.com/terraform/install)
 - AWS CLI configured with credentials (`aws configure`)
 - An EC2 key pair in your target region (for SSH tunnel access)
+- [Anthropic API key](https://console.anthropic.com/) for Claude CLI (required by Paperclip)
 
 ## Quick start
 
@@ -49,8 +50,8 @@ aws ssm start-session \
 # 1. Initialise Terraform (downloads the AWS provider)
 terraform init
 
-# 2. Deploy (pass your EC2 key pair name for SSH access)
-terraform apply -var="key_name=<your-key-pair>"
+# 2. Deploy (pass your EC2 key pair name and Anthropic API key)
+terraform apply -var="key_name=<your-key-pair>" -var="anthropic_api_key=<your-api-key>"
 ```
 
 After `apply` finishes, Terraform prints:
@@ -85,16 +86,18 @@ journalctl -fu paperclip
 
 | Variable | Default | Description |
 |---|---|---|
-| `aws_region` | `us-east-1` | AWS region to deploy into |
-| `instance_type` | `t4g.micro` | EC2 instance type |
-| `key_name` | `null` | EC2 key pair name for SSH tunnel access |
+| `aws_region` | `ap-northeast-1` | AWS region to deploy into |
+| `instance_type` | `t4g.small` | EC2 instance type (ARM64). Use `t3.micro` for Free Tier (x86_64) |
+| `key_name` | `null` | EC2 key pair name for SSH tunnel access (optional if using SSM) |
+| `anthropic_api_key` | — | Anthropic API key for Claude CLI (**required**) |
 
 Variables can be set on the command line, in `terraform.tfvars`, or as environment variables (`TF_VAR_*`):
 
 ```bash
 # terraform.tfvars (gitignored)
-instance_type = "t3.micro"
-key_name      = "my-key-pair"
+instance_type     = "t3.micro"
+key_name          = "my-key-pair"
+anthropic_api_key = "sk-ant-..."
 ```
 
 ## Useful commands
